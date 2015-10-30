@@ -33,4 +33,81 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $plugin = new Plugin;
         $this->assertInternalType('array', $plugin->getSubscribedEvents());
     }
+
+    /**
+     * Tests handleCfpCommand().
+     */
+    public function testHandleCfpCommand()
+    {
+        $event = $this->getMockCommandEvent();
+        $queue = $this->getMockEventQueue();
+        $plugin = new Plugin;
+
+        Phake::when($event)->getSource()->thenReturn('#channel1');
+        Phake::when($event)->getCommand()->thenReturn('PRIVMSG');
+
+        $plugin->handleCfpCommand($event, $queue);
+        Phake::when($event)->getCustomParams()->thenReturn(array('#channel1'));
+
+        Phake::verify($queue, Phake::atLeast(1))->ircPrivmsg('#channel1', $this->isType('string'));
+    }
+
+    /**
+     * Tests handleCfpHelp().
+     *
+     * @param string $method
+     * @dataProvider dataProviderHandleHelp
+     */
+    public function testHandleCfpHelp($method)
+    {
+        $event = $this->getMockCommandEvent();
+
+        Phake::when($event)->getCustomParams()->thenReturn(array());
+        Phake::when($event)->getSource()->thenReturn('#channel');
+        Phake::when($event)->getCommand()->thenReturn('PRIVMSG');
+        $queue = $this->getMockEventQueue();
+
+        $plugin = new Plugin;
+        $plugin->$method($event, $queue);
+
+        Phake::verify($queue, Phake::atLeast(1))
+             ->ircPrivmsg('#channel', $this->isType('string'));
+    }
+
+    /**
+     * Returns a mock command event
+     *
+     * @return \Phergie\Irc\Plugin\React\Command\CommandEvent
+     */
+    private function getMockCommandEvent()
+    {
+        return Phake::mock('Phergie\Irc\Plugin\React\Command\CommandEvent');
+    }
+
+    /**
+     * Returns a mock event queue.
+     *
+     * @return \Phergie\Irc\Bot\React\EventQueueInterface
+     */
+    protected function getMockEventQueue()
+    {
+        return Phake::mock('Phergie\Irc\Bot\React\EventQueueInterface');
+    }
+
+    /**
+     * Data provider for testHandleHelp().
+     *
+     * @return array
+     */
+    public function dataProviderHandleHelp()
+    {
+        $data = array();
+        $methods = array(
+            'handleCfpHelp',
+        );
+        foreach ($methods as $method) {
+            $data[] = array($method);
+        }
+        return $data;
+    }
 }

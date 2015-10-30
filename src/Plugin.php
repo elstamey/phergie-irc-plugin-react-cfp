@@ -44,17 +44,60 @@ class Plugin extends AbstractPlugin
     public function getSubscribedEvents()
     {
         return [
-            'command.' => 'handleCommand',
+            'command.cfp' => 'handleCfpCommand',
+            'command.cfp.help' => 'handleCfpHelp',
         ];
     }
 
     /**
      *
+     * @param \Phergie\Irc\Plugin\React\Command\CommandEvent $event
+     * @param \Phergie\Irc\Bot\React\EventQueueInterface $queue
+     *
+     */
+    public function handleCfpCommand(Event $event, Queue $queue)
+    {
+        $channel = $event->getSource();
+        $params = $event->getCustomParams();
+
+        if ($params[0] = "help") {
+            $this->handleCfpHelp($event, $queue);
+            $msgString = "";
+        } else {
+            $msgString = $this->getAllCfp($event->getCustomParams());
+        }
+
+        $queue->ircPrivmsg($channel, $msgString);
+    }
+
+    /**
+     * Cfp Command Help
      *
      * @param \Phergie\Irc\Plugin\React\Command\CommandEvent $event
      * @param \Phergie\Irc\Bot\React\EventQueueInterface $queue
      */
-    public function handleCommand(Event $event, Queue $queue)
+    public function handleCfpHelp(Event $event, Queue $queue)
     {
+        $this->sendHelpReply($event, $queue, [
+            'Usage: cfp ',
+            'parameters - for now there are no implemented parameters for cfp to modify the request)',
+            'Instructs the bot to return a list of open Calls for Papers.',
+        ]);
+    }
+
+    /**
+     * Responds to a help command.
+     *
+     * @param \Phergie\Irc\Plugin\React\Command\CommandEvent $event
+     * @param \Phergie\Irc\Bot\React\EventQueueInterface $queue
+     * @param array $messages
+     */
+    protected function sendHelpReply(Event $event, Queue $queue, array $messages)
+    {
+        $method = 'irc' . $event->getCommand();
+        $target = $event->getSource();
+        foreach ($messages as $message) {
+            $queue->$method($target, $message);
+        }
     }
 }
