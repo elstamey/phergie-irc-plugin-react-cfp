@@ -36,11 +36,11 @@ abstract class AbstractAdapter
             'url' => $apiUrl,
             'resolveCallback' =>
                 function ($data, $headers, $code) use ($deferred) {
-                    $result = $this->handleResponse($data, $headers, $code);
-                    if ($result === false) {
+                    $cfps = $this->handleResponse($data, $headers, $code);
+                    if ($cfps === false) {
                         $deferred->reject();
                     } else {
-                        $deferred->resolve($result);
+                        $deferred->resolve($cfps);
                     }
                 },
             'rejectCallback' => [$deferred, 'reject']
