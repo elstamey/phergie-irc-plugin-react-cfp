@@ -12,6 +12,7 @@ namespace Phergie\Irc\Plugin\React\Cfp;
 
 use Phergie\Irc\Bot\React\AbstractPlugin;
 use Phergie\Irc\Bot\React\EventQueueInterface as Queue;
+use Phergie\Irc\Plugin\React\Cfp\Adapter\JoinedIn;
 use Phergie\Irc\Plugin\React\Command\CommandEvent as Event;
 
 /**
@@ -64,7 +65,7 @@ class Plugin extends AbstractPlugin
             $this->handleCfpHelp($event, $queue);
             $msgString = "";
         } else {
-            $msgString = $this->getAllCfp($event->getCustomParams());
+            $msgString = $this->fetchCfp($event, $queue, $event->getCustomParams());
         }
 
         $queue->ircPrivmsg($channel, $msgString);
@@ -83,6 +84,26 @@ class Plugin extends AbstractPlugin
             'parameters - for now there are no implemented parameters for cfp to modify the request)',
             'Instructs the bot to return a list of open Calls for Papers.',
         ]);
+    }
+
+    /**
+     * @param $event
+     * @param $queue
+     * @param array $params
+     *
+     * @return \WyriHaximus\React\Guzzle\HttpClient\Request
+     */
+    public function fetchCfp($event, $queue, $params=array())
+    {
+        if (count( $params ) > 1) {
+            echo "handle these parameters";
+        }
+
+        $this->adapter = new JoinedIn();
+
+        $cfps = $this->adapter->getApiRequest($this->adapter->getApiUrl());
+
+        return $cfps;
     }
 
     /**

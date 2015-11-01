@@ -52,6 +52,21 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         Phake::verify($queue, Phake::atLeast(1))->ircPrivmsg('#channel1', $this->isType('string'));
     }
 
+    public function testFetchCfp()
+    {
+        $event = $this->getMockCommandEvent();
+        $queue = $this->getMockEventQueue();
+        $method = new \ReflectionMethod(
+            'Phergie\Irc\Plugin\React\Cfp\Plugin', 'fetchCfp'
+        );
+        $method->setAccessible(TRUE);
+
+        $this->assertEquals(
+            'some CFPs from the API',
+            $method->invoke(new Plugin(), $event, $queue, array('php'))
+        );
+    }
+
     /**
      * Tests handleCfpHelp().
      *
