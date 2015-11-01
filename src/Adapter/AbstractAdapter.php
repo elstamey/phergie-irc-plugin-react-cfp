@@ -18,10 +18,9 @@ abstract class AbstractAdapter
     /**
      * Get the URL for the API Request
      *
-     * @param $url
      * @return string
      */
-    public abstract function getApiUrl($url);
+    public abstract function getApiUrl();
 
     /**
      * Create the API Request

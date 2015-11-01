@@ -14,10 +14,9 @@ class JoinedIn extends AbstractAdapter
     /**
      * Get the URL for the API Request
      *
-     * @param $url
      * @return string
      */
-    public function getApiUrl($url)
+    public function getApiUrl()
     {
         return 'http://api.joind.in';
     }
