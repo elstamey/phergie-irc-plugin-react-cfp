@@ -101,7 +101,9 @@ class Plugin extends AbstractPlugin
 
         $this->adapter = new JoinedIn();
 
-        $cfps = $this->adapter->getApiRequest($this->adapter->getApiUrl());
+        $cfps = $this->adapter->getApiRequest(
+            $this->adapter->getApiUrl()
+        );
 
         return $cfps;
     }
