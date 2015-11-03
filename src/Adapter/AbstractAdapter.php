@@ -11,7 +11,7 @@
 namespace Phergie\Irc\Plugin\React\Cfp\Adapter;
 
 use React\Promise\Deferred;
-use WyriHaximus\React\Guzzle\HttpClient\Request;
+use Phergie\Plugin\Http\Request;
 
 abstract class AbstractAdapter
 {
