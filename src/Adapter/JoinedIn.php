@@ -18,7 +18,7 @@ class JoinedIn extends AbstractAdapter
      */
     public function getApiUrl()
     {
-        return 'http://api.joind.in';
+        return 'http://api.joind.in/v2.1/events?filter=cfp';
     }
 
     /**
