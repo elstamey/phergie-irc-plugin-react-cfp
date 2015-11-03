@@ -107,7 +107,9 @@ class Plugin extends AbstractPlugin
             $queue
         );
 
-        return $cfps;
+
+        $this->getEventEmitter()->emit('http.request',[$cfps]);
+
     }
 
     /**

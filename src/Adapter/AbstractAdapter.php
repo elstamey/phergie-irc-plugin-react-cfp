@@ -33,21 +33,24 @@ abstract class AbstractAdapter
      */
     public function getApiRequest($apiUrl, $event, $queue)
     {
-        return new Request([
+        $request = new Request([
             'url' => $apiUrl,
             'resolveCallback' =>
-                function ($data, $headers, $code) use ($event, $queue) {
-                    $cfps = $this->handleResponse($data, $headers, $code);
+                function ($response) use ($event, $queue) {
+                    $cfps = $this->handleResponse($response);
                     if (count($cfps) > 0) {
                         $queue->ircPrivmsg($event->getSource(), $cfps);
                     }
                 },
+            'method' => 'GET',
             'rejectCallback' =>
-                function ($data, $headers, $code) use ($event, $queue) {
+                function ($response) use ($event, $queue) {
                     $this->getLogger()->notice('[JoindIn] Site failed to respond');
                     $queue->ircPrivmsg($event->getSource(), 'Sorry, there was a problem communicating with the CFP site');
                 },
         ]);
+
+        return $request;
     }
 
     /**
