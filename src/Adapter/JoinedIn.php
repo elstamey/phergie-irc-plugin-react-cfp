@@ -31,6 +31,9 @@ class JoinedIn extends AbstractAdapter
      */
     public function handleResponse($data, $headers, $code)
     {
+        foreach ($data as $d) {
+            die(var_dump($d));
+        }
         if ($code == 201) {
             return $data;
         }
