@@ -14,6 +14,7 @@ use Phake;
 use Phergie\Irc\Bot\React\EventQueueInterface as Queue;
 use Phergie\Irc\Plugin\React\Command\CommandEvent as Event;
 use Phergie\Irc\Plugin\React\Cfp\Plugin;
+use React\Promise\Deferred;
 
 /**
  * Tests for the Plugin class.
@@ -42,11 +43,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockCommandEvent();
         $queue = $this->getMockEventQueue();
         $plugin = new Plugin;
+        $deferred = new Deferred();
 
         Phake::when($event)->getSource()->thenReturn('#channel1');
         Phake::when($event)->getCommand()->thenReturn('PRIVMSG');
 
-        $plugin->handleCfpCommand($event, $queue);
+        $plugin->handleCfpCommand($event, $queue, $deferred);
         Phake::when($event)->getCustomParams()->thenReturn(array('#channel1'));
 
         Phake::verify($queue, Phake::atLeast(1))->ircPrivmsg('#channel1', $this->isType('string'));
@@ -56,6 +58,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->getMockCommandEvent();
         $queue = $this->getMockEventQueue();
+        $deferred = new Deferred();
+
         $method = new \ReflectionMethod(
             'Phergie\Irc\Plugin\React\Cfp\Plugin', 'fetchCfp'
         );
@@ -63,7 +67,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'some CFPs from the API',
-            $method->invoke(new Plugin(), $event, $queue, array('php'))
+            $method->invoke(new Plugin(), $event, $queue, array('php'), $deferred)
         );
     }
 

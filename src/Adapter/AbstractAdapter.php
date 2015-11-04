@@ -28,27 +28,28 @@ abstract class AbstractAdapter
      * @param string $apiUrl
      * @param $event
      * @param $queue
+     * @param Deferred $deferred
      *
      * @return Request
      */
-    public function getApiRequest($apiUrl, $event, $queue)
+    public function getApiRequest($apiUrl, $event, $queue, Deferred $deferred)
     {
         $request = new Request([
             'url' => $apiUrl,
             'resolveCallback' =>
-                function ($data) use ($event, $queue) {
-                    $cfps = $this->handleResponse($data);
-                    if (count($cfps) > 0) {
-                        $queue->ircPrivmsg($event->getSource(), $cfps);
+                function ($data, $headers, $code) use ($deferred) {
+                    $cfps = $this->handleResponse($data, $headers, $code);
+                    if ($cfps === false) {
+                        $deferred->reject();
+                    } else {
+                        $deferred->resolve($cfps);
                     }
                 },
             'method' => 'GET',
-            'rejectCallback' =>
-                function ($response) use ($event, $queue) {
-                    $this->getLogger()->notice('[JoindIn] Site failed to respond');
-                    $queue->ircPrivmsg($event->getSource(), 'Sorry, there was a problem communicating with the CFP site');
-                },
+            'rejectCallback' => [$deferred, 'reject']
         ]);
+
+        die(var_dump($cfps));
 
         return $this->getEventEmitter()->emit('http.request',[$request]);
     }

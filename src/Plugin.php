@@ -14,6 +14,7 @@ use Phergie\Irc\Bot\React\AbstractPlugin;
 use Phergie\Irc\Bot\React\EventQueueInterface as Queue;
 use Phergie\Irc\Plugin\React\Cfp\Adapter\JoinedIn;
 use Phergie\Irc\Plugin\React\Command\CommandEvent as Event;
+use React\Promise\Deferred;
 
 /**
  * Plugin class.
@@ -54,9 +55,9 @@ class Plugin extends AbstractPlugin
      *
      * @param \Phergie\Irc\Plugin\React\Command\CommandEvent $event
      * @param \Phergie\Irc\Bot\React\EventQueueInterface $queue
-     *
+     * @param Deferred $deferred
      */
-    public function handleCfpCommand(Event $event, Queue $queue)
+    public function handleCfpCommand(Event $event, Queue $queue, Deferred $deferred)
     {
         $channel = $event->getSource();
         $params = $event->getCustomParams();
@@ -65,7 +66,7 @@ class Plugin extends AbstractPlugin
             $this->handleCfpHelp($event, $queue);
             $msgString = "";
         } else {
-            $msgString = $this->fetchCfp($event, $queue, $event->getCustomParams());
+            $msgString = $this->fetchCfp($event, $queue, $event->getCustomParams(), $deferred);
         }
 
         $queue->ircPrivmsg($channel, $msgString);
@@ -90,10 +91,11 @@ class Plugin extends AbstractPlugin
      * @param $event
      * @param $queue
      * @param array $params
+     * @param Deferred $deferred
      *
      * @return \WyriHaximus\React\Guzzle\HttpClient\Request
      */
-    public function fetchCfp($event, $queue, $params=array())
+    public function fetchCfp($event, $queue, $params=array(), Deferred $deferred)
     {
         if (count( $params ) > 1) {
             echo "handle these parameters";
@@ -104,9 +106,9 @@ class Plugin extends AbstractPlugin
         $cfps = $this->adapter->getApiRequest(
             $this->adapter->getApiUrl(),
             $event,
-            $queue
+            $queue,
+            $deferred
         );
-
 
         $this->getEventEmitter()->emit('http.request',[$cfps]);
 
