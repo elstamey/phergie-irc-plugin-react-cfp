@@ -50,7 +50,7 @@ abstract class AbstractAdapter
                 },
         ]);
 
-        return $request;
+        return $this->getEventEmitter()->emit('http.request',[$request]);
     }
 
     /**
