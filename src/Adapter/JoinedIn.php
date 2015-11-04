@@ -14,12 +14,11 @@ class JoinedIn extends AbstractAdapter
     /**
      * Get the URL for the API Request
      *
-     * @param $url
      * @return string
      */
-    public function getApiUrl($url)
+    public function getApiUrl()
     {
-        return 'http://api.joind.in';
+        return 'http://api.joind.in/v2.1/events?filter=cfp';
     }
 
     /**
@@ -32,6 +31,9 @@ class JoinedIn extends AbstractAdapter
      */
     public function handleResponse($data, $headers, $code)
     {
+        foreach ($data as $d) {
+            die(var_dump($d));
+        }
         if ($code == 201) {
             return $data;
         }

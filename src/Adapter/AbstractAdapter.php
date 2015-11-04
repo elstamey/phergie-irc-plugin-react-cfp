@@ -11,28 +11,30 @@
 namespace Phergie\Irc\Plugin\React\Cfp\Adapter;
 
 use React\Promise\Deferred;
-use WyriHaximus\React\Guzzle\HttpClient\Request;
+use Phergie\Plugin\Http\Request;
 
 abstract class AbstractAdapter
 {
     /**
      * Get the URL for the API Request
      *
-     * @param $url
      * @return string
      */
-    public abstract function getApiUrl($url);
+    public abstract function getApiUrl();
 
     /**
      * Create the API Request
      *
      * @param string $apiUrl
+     * @param $event
+     * @param $queue
      * @param Deferred $deferred
+     *
      * @return Request
      */
-    public function getApiRequest($apiUrl, $deferred)
+    public function getApiRequest($apiUrl, $event, $queue, Deferred $deferred)
     {
-        return new Request([
+        $request = new Request([
             'url' => $apiUrl,
             'resolveCallback' =>
                 function ($data, $headers, $code) use ($deferred) {
@@ -43,8 +45,13 @@ abstract class AbstractAdapter
                         $deferred->resolve($cfps);
                     }
                 },
+            'method' => 'GET',
             'rejectCallback' => [$deferred, 'reject']
         ]);
+
+        die(var_dump($cfps));
+
+        return $this->getEventEmitter()->emit('http.request',[$request]);
     }
 
     /**
