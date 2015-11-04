@@ -36,8 +36,8 @@ abstract class AbstractAdapter
         $request = new Request([
             'url' => $apiUrl,
             'resolveCallback' =>
-                function ($response) use ($event, $queue) {
-                    $cfps = $this->handleResponse($response);
+                function ($data) use ($event, $queue) {
+                    $cfps = $this->handleResponse($data);
                     if (count($cfps) > 0) {
                         $queue->ircPrivmsg($event->getSource(), $cfps);
                     }
